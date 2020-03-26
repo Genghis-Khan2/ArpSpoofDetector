@@ -1,6 +1,6 @@
 from scapy.all import *
 from argparse import ArgumentParser
-
+from arp_table import get_arp_table
 
 hw_addresses = []
 p_addresses = []
@@ -16,6 +16,10 @@ def check_for_dup(packet):
     hw_addresses.append(packet[ARP].hwsrc)
     p_addresses.append(packet[ARP].psrc)
 
+def check_for_dup2(packet): #Pun intended!
+    for entry in get_arp_table():
+        if entry['HW address'] == packet[ARP].hwsrc and packet[ARP].psrc != entry['IP address']:
+            raise ValueError
 
 def main():
     parser = ArgumentParser(description="Detects if an ARP poisoning attack is occuring")
