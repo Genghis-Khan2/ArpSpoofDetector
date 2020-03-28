@@ -21,13 +21,19 @@ def check_for_dup2(packet): #Pun intended!
         if entry['HW address'] == packet[ARP].hwsrc and packet[ARP].psrc != entry['IP address']:
             raise ValueError
 
+
+def full_dup_check(packet):
+    check_for_dup(packet)
+    check_for_dup2(packet)
+
+
 def main():
     parser = ArgumentParser(description="Detects if an ARP poisoning attack is occuring")
     parser.add_argument("-t", "--time", default=20, type=int, help="Time to wait until check for duplicate ARP is-at messages")
     args = parser.parse_args()
 
     try:
-        packets = sniff(timeout=args.time, lfilter=arp_filter, prn=check_for_dup)
+        packets = sniff(timeout=args.time, lfilter=arp_filter, prn=full_dup_check)
     except ValueError:
         print("You are being poisoned!")
 
